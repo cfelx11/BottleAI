@@ -1,0 +1,15 @@
+<div class="container">
+  <div class="card">
+    <h2><i class="fas fa-trophy"></i> Leaderboard</h2>
+    <table>
+      <tr><th>Rank</th><th>User</th><th>Points</th></tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><i class="fas fa-user"></i> {{ user['username'] }}</td>
+        <td><i class="fas fa-star"></i> {{ user['points'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>

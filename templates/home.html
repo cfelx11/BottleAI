@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BottleAI - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="container glass">
+        <h1>Welcome to BottleAI</h1>
+        <p>Scan your QR code or log in to see your bottle classification dashboard.</p>
+        <div class="buttons">
+            <a href="{{ url_for('login') }}" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="{{ url_for('register') }}" class="btn"><i class="fas fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - BottleAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container glass">
+        <h2>Hello, {{ user.username }}</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <i class="fas fa-check-circle fa-2x"></i>
+                <p>Good Bottles</p>
+                <h3 id="good-count">{{ good_count }}</h3>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-times-circle fa-2x"></i>
+                <p>Crumpled Bottles</p>
+                <h3 id="crumpled-count">{{ crumpled_count }}</h3>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-star fa-2x"></i>
+                <p>Reward Points</p>
+                <h3>{{ user.points }}</h3>
+            </div>
+        </div>
+
+        <canvas id="bottleChart"></canvas>
+
+        <h3>Recent Bottle Logs</h3>
+        <ul id="log-container">
+            {% for log in logs %}
+                <li>{{ log.prediction }} at {{ log.created_at }}</li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ url_for('logout') }}" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <script>
+        const USER_ID = {{ user.id }};
+        var socket = io();
+
+        socket.on('update_dashboard', function(data) {
+            if (data.user_id === USER_ID) {
+                const logContainer = document.getElementById('log-container');
+                const newLog = document.createElement('li');
+                newLog.textContent = `${data.prediction} at ${new Date().toLocaleTimeString()}`;
+                logContainer.prepend(newLog);
+
+                if (data.prediction === 'GOOD') {
+                    document.getElementById('good-count').textContent =
+                        parseInt(document.getElementById('good-count').textContent) + 1;
+                } else {
+                    document.getElementById('crumpled-count').textContent =
+                        parseInt(document.getElementById('crumpled-count').textContent) + 1;
+                }
+
+                updateChart();
+            }
+        });
+
+        const ctx = document.getElementById('bottleChart').getContext('2d');
+        const bottleChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Good', 'Crumpled'],
+                datasets: [{
+                    label: 'Bottle Status',
+                    data: [{{ good_count }}, {{ crumpled_count }}],
+                    backgroundColor: ['#4ade80','#f87171'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                }
+            }
+        });
+
+        function updateChart() {
+            bottleChart.data.datasets[0].data = [
+                parseInt(document.getElementById('good-count').textContent),
+                parseInt(document.getElementById('crumpled-count').textContent)
+            ];
+            bottleChart.update();
+        }
+    </script>
+</body>
+</html>
